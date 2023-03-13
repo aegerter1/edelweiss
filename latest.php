@@ -1,67 +1,103 @@
 <?php
 include("Controller/Upload.php");
-$upload = New Upload;
-$rows = $upload->index();
+$upload = new Upload;
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'DESC';
+$rows = $upload->index($sort);
+
+include_once('Controller/Votes.php');
+$votes = new Votes();
 
 include("header.php");
 
-?>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">  
-              <h2>Latest artworks</h2>
-              <form>
-                <div class="">
-                <label>Sorting</label>
-                <select>
-                    <option>Most Popular</option>
-                    <option>Most Recent</option>
-                </select>
-                </div>
-                <label>Dispaly</label>
-                <select name="type">
-                    <option value="thumbnail">Thumbnail</option>
-                    <option value="list">List</option>
-                </select>
-                <input type="submit" value="Load"  class="btn btn-primary"> 
-                </form>
-                <div class="row py-3">
-                    <?php if(!empty($rows)){
-                        foreach($rows as $row){
-                        ?>
-                    <?php if((($_GET['type']))=="list"){ ?>
-                        <!-- Show list image -->
-                        <div class="col-md-12 py-3">
-                         <div class="vote">
-                            <div class="up-vote">
-                        <i class="fa fa-angle-up fa-3x"></i>
-                    </div>
-                    <div class="down-vote">
-                        <i class="fa fa-angle-down fa-3x"></i>
-                    </div>
-                    </div>
-                        <a href="post.php?id=<?php echo $row['id'];?>"><img class="img-fluid" src="<?php echo "uploads/".$row['src']?>"></a>
-                    </div>
-                     <!-- end list image -->
-                        <?php }  else { ?>
-                            <!-- Show list thumdnail -->
-                    <div class="col-md-4 py-3">
-                    <div class="vote">
-                            <div class="up-vote">
-                        <i class="fa fa-angle-up fa-3x"></i>
-                    </div>
-                    <div class="down-vote">
-                        <i class="fa fa-angle-down fa-3x"></i>
-                    </div>
-                    </div>
-                        <a href="post.php?id=<?php echo $row['id'];?>"><img class="img-fluid" src="<?php echo "uploads/thumnails/".$row['src']?>"></a>
-                    </div>
-                    <!-- end thumbnail image-->
-                    <?php } }
-                }?>
 
+
+
+?>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Edelweiss Bilder</h1>
+            <br>
+            <form>
+                <div class="">
+                    <label>
+                        <h3>Sortieren</h3>
+                    </label>
+                    <select name="sort">
+                        <option value="ASC">Am beliebtesten</option>
+                        <option value="DESC">Neueste</option>
+                    </select>
                 </div>
-                </div>
-                </div>
+                <br>
+                <label>
+                    <h3>Anzeige</h3>
+                </label>
+                <select name="type">
+                    <option value="thumbnail">Miniaturansicht</option>
+                    <option value="list">Liste</option>
+                </select>
+                <br>
+                <br>
+                <br>
+                <input type="submit" value="Laden" class="btn btn-primary btn1">
+            </form>
+
+            <div class="row py-3">
+                <?php if (!empty($rows)) {
+                    foreach ($rows as $row) {
+                ?>
+                        <?php if ((($_GET['type'])) == "list") { ?>
+                            <!-- Show list image -->
+                            <div class="col-md-12 py-3">
+                                <div class="vote">
+                                    <div class="up-vote">
+                                        <i class="fa fa-angle-up fa-3x" onclick="upvote(<?php echo $row['id']; ?>)"></i>
+                                        <span id="up_<?php echo $row['id']; ?>"><?php echo $votes->get_upvotes($row['id']); ?></span>
+                                    </div>
+                                    <div class="down-vote">
+                                        <i class="fa fa-angle-down fa-3x" onclick="downvote(<?php echo $row['id']; ?>)"></i>
+                                        <span id="down_<?php echo $row['id']; ?>"><?php echo $votes->get_downvotes($row['id']); ?></span>
+                                    </div>
+                                    created date: <?php echo $row['created_at']; ?>
+                                </div>
+
+                                <a href="post.php?id=<?php echo $row['id']; ?>">
+                                    <picture class="card-image1" data-image-full="uploads/<?php echo $row['src']; ?>">
+                                        <source src="<?php echo "uploads/" . $row['src'] ?>">
+                                        <img class="img-fluid star" src="<?php echo "uploads/" . $row['src'] ?>" alt="<?php echo $row['title']; ?>" loading="lazy">
+                                    </picture>
+                                </a>
+                            </div>
+                            <!-- end list image -->
+                        <?php } else { ?>
+                            <!-- Show list thumdnail -->
+                            <div class="col-md-4 py-3">
+                                <div class="vote">
+                                    <div class="up-vote">
+                                        <i class="fa fa-angle-up fa-3x" onclick="upvote(<?php echo $row['id']; ?>)"></i>
+                                        <span id="up_<?php echo $row['id']; ?>"><?php echo $votes->get_upvotes($row['id']); ?></span>
+                                    </div>
+                                    <div class="down-vote">
+                                        <i class="fa fa-angle-down fa-3x" onclick="downvote(<?php echo $row['id']; ?>)"></i>
+                                        <span id="down_<?php echo $row['id']; ?>"><?php echo $votes->get_downvotes($row['id']); ?></span>
+                                    </div>
+                                    created date: <?php echo $row['created_at']; ?>
+                                </div>
+
+                                <a href="post.php?id=<?php echo $row['id']; ?>">
+                                    <picture class="card-image1" data-image-full="uploads/thumnails/<?php echo $row['src']; ?>">
+                                        <source src="<?php echo "uploads/thumnails/" . $row['src'] ?>">
+                                        <img class="img-fluid star" src="<?php echo "uploads/thumnails/" . $row['src'] ?>" alt="<?php echo $row['title']; ?>" loading="lazy">
+                                    </picture>
+                                </a>
+                            </div>
+                            <!-- end thumbnail image-->
+                <?php }
+                    }
+                } ?>
+
+            </div>
         </div>
-<?php include("footer.php");?>
+    </div>
+</div>
+<?php include("footer.php"); ?>
